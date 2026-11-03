@@ -10,7 +10,7 @@ if [[ ! -f "$CSV_FILE" ]]; then
     echo "Error: $CSV_FILE not found">&2
 fi
 #printing the header
-printf "%4s %-16s %4s %4s %4s %4s %6s %s\n "RANK" "NAME" "HTML" "CSS" "BASH" "GIT" "AVERAGE" "MENTION""
+printf "%4s %-16s %4s %4s %4s %4s %6s %s\n" "RANK" "NAME" "HTML" "CSS" "BASH" "GIT" "AVERAGE" "MENTION"
 
 
 line_num=0
