@@ -8,7 +8,11 @@ Rebase instructors receive a spreadsheet of scores and spend an evening calculat
 
 ## 🎯 Project Goals
 
-The project's goal is to allow users to input numbers over and over until they guess the random number given by the program correctly.
+- collect scores for students in their various courses
+- calculate the total score per student
+- calculate the average per studen
+- get the rank of each student based on their scores
+- give their mentions with respet to their averages
 
 ## 🛠 Tech Stack
 
@@ -34,12 +38,14 @@ git clone https://github.com/NyapB/Bash-09-grade-report.git
 
 ## 🧠 Challenges Faced
 
-Handling limit for random selection function
-using the count function to deternine the number of times the user tried before getting it right.
+- identifying a file
+- looping through to validate the information in the file
+- carrying calculations as bash does not work with decimals
 
 ## 📚 What I Learned
 
-I learned a good number of concepts on bash like random functions and incrementation.
+- strengthen checks using while loops and if statements
+- compressing codes inorder to have very long codes
 
 ## 👨🏽‍💻 Author
 
