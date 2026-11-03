@@ -1,10 +1,10 @@
 # 🏷 Grade Report
 
-A guessing game built with batch
+A ggrades report for students built with bash
 
 ## 📌 Problem Statement
 
-using this project to learn and practice bash programming
+Rebase instructors receive a spreadsheet of scores and spend an evening calculating averages and rankings by hand. Build grades.sh helps the instructors to take two seconds.
 
 ## 🎯 Project Goals
 
@@ -13,21 +13,23 @@ The project's goal is to allow users to input numbers over and over until they g
 ## 🛠 Tech Stack
 
 bash
+Git
+GitHub
 
 ## 📷 Screenshots
 
-![Bash Script](<assets/images/Screenshot From 2026-10-24 09-18-08.png>)
+![bash grade_report](<assets/images/Screenshot From 2026-11-03 14-28-22.png>)
 
 ## ⚙ Installation & Setup
 
 clone the repository
 
 ```bash
-git clone https://github.com/NyapB/Bash_Guessing_Game.git
+git clone https://github.com/NyapB/Bash-09-grade-report.git
 
-- cd Bash_Guessing_Game
-- give permission using chmod +x guessing-game.sh
-- run with ./guessing-game.sh
+- cd Bash_09_grade_report
+- give permission using chmod +x grades.sh
+- run with ./grades.sh
 ```
 
 ## 🧠 Challenges Faced

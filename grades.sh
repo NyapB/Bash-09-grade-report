@@ -99,7 +99,7 @@ done < "$CSV_FILE"
 
 #sort and print the rank tbale
 rank=0
-sort -t'\' -k1,1 -rn "$tmp" | while IFS='|' read -r average name html css bash git mention; do
+sort -t "\\" -k1,1 -rn "$tmp" | while IFS='|' read -r average name html css bash git mention; do
     ((rank++))
     printf "%4s %-16s %4s %4s %4s %4s %6s %s\n" "$rank" "$name" "$html" "$css" "$bash" "$git" "$average" "$mention"
     done
