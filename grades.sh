@@ -21,7 +21,7 @@ class_total_score=0
 #temporary for sorting files
 tmp=$(mktemp)
 
-while IFS="," read -r raw_name raw_html raw_css raw_git || [[ -n "$raw_name" ]]; do
+while IFS="," read -r raw_name raw_html raw_css raw_bash raw_git || [[ -n "$raw_name" ]]; do
     ((line_num++))
 
     if [[ "$line_num" -eq 1 ]]; then
@@ -101,7 +101,7 @@ done < "$CSV_FILE"
 rank=0
 sort -t'\' -k1,1 -rn "$tmp" | while IFS='|' read -r average name html css bash git mention; do
     ((rank++))
-    printf "%4s %-16s %4s %4s %4s %4s %6s %s\n "$rank" "$name" "$html" "$css" '$bash" "$git" "$average" "$mention"
+    printf "%4s %-16s %4s %4s %4s %4s %6s %s\n" "$rank" "$name" "$html" "$css" "$bash" "$git" "$average" "$mention"
     done
 
 #remove temporary file
