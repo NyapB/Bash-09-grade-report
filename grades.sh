@@ -7,6 +7,7 @@ fi
 
 CSV_FILE="$1"
 line_num=0
+Skip_count=0
 
 while IFS="," read -r raw_name raw_html raw_css raw_git || [[ -n "$raw_name" ]]; do
     ((line_num++))
@@ -22,10 +23,39 @@ while IFS="," read -r raw_name raw_html raw_css raw_git || [[ -n "$raw_name" ]];
     bash=$(echo "$raw_bash" | tr -d '\r' | xargs)
     git=$(echo "$raw_git" | tr -d '\r' | xargs)
 
-    if [[ -z "$html" ]] || [[ "$html" =~ [a-zA-Z] ]]; then
+    #checking for missing name
+    if [[ -z "$name" ]]; then
+        echo "Error: line $line_num skipped (missing name)"
+        ((Skip_count++))
         continue
     fi
 
+    #checking for missing scores
+    if [[ -z "$html" ]] || [[ -z "$css" ]] || [[ -z "$bash" ]] || [[ -z "$git" ]]; then
+        echo "Error: line $line_num skipped (missing score)"
+        ((Skip_count++))
+    fi
+
+    #make sure that scores are numeric and should not exceed 20
+    invalid_score=0
+    for score in "$html" "$css" "$bash" "$git"; do
+        if ! [[ "$score" =~ ^[0-9]+$ ]]; then
+            echo "Error: line $line_num skipped (score, $score is not numeric)"
+            invalid_score=1
+            break
+        fi
+
+        if ((score > 20)); then
+            echo "Error: line $line_num skipped (score, $score is greater then 20)"
+            invalid_score=1
+            break
+        fi
+    done
+
+    if [[ "$invalid_score" -eq 1 ]]; then
+        ((Skip_count++))
+        continue
+    fi
     #calculate total score
     total_score=$((html + css + bash + git))
 
@@ -51,3 +81,6 @@ while IFS="," read -r raw_name raw_html raw_css raw_git || [[ -n "$raw_name" ]];
 
     echo "Line $line_num name is $raw_name"
 done < "$CSV_FILE"
+
+#print the number of skipped lines
+echo "The total lines skipped are: $Skip_count"
