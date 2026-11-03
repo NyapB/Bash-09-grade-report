@@ -36,13 +36,13 @@ while IFS="," read -r raw_name raw_html raw_css raw_git || [[ -n "$raw_name" ]];
     echo "Student: $name | $total_score | $average"
 
     #compare the mention using the total score since the bash can not compare average since its in decimals
-    if (($total_score >= 64)); then 
+    if ((total_score >= 64)); then 
         mention="tres bien"
-    elif (($total_score >= 56)); then
+    elif ((total_score >= 56)); then
         mention="bien"
-    elif (($total_score >= 46)); then
+    elif ((total_score >= 46)); then
         mention="assez bien"
-    elif (($total_score >= 46)); then
+    elif ((total_score >= 46)); then
         mention="passable"
     else
         mention="echec"
