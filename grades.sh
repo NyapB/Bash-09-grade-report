@@ -6,59 +6,61 @@ if [[ $# -ne 1 ]]; then
 fi
 
 CSV_FILE="$1"
-if [[ ! -f "$CSV_FILE" ]]; then
-    echo "Error: $CSV_FILE not found">&2
-fi
-#printing the header
-printf "%4s %-16s %4s %4s %4s %4s %6s %s\n" "RANK" "NAME" "HTML" "CSS" "BASH" "GIT" "AVERAGE" "MENTION"
 
+# Check if file exists AND is readable
+if [[ ! -f "$CSV_FILE" ]] || [[ ! -r "$CSV_FILE" ]]; then
+    echo "Error: $CSV_FILE not found or not readable" >&2
+    exit 1
+fi
+
+# Printing the header (AVERAGE changed to %7s for correct column alignment)
+printf "%4s %-16s %4s %4s %4s %4s %7s %s\n" "RANK" "NAME" "HTML" "CSS" "BASH" "GIT" "AVERAGE" "MENTION"
 
 line_num=0
 Skip_count=0
 num_students=0
 class_total_score=0
 
-#temporary for sorting files
+# Temporary file for sorting
 tmp=$(mktemp)
 
 while IFS="," read -r raw_name raw_html raw_css raw_bash raw_git || [[ -n "$raw_name" ]]; do
     ((line_num++))
-
     if [[ "$line_num" -eq 1 ]]; then
         continue
     fi
 
-    #data cleaning
+    # Data cleaning
     name=$(echo "$raw_name" | tr -d '\r' | xargs)
     html=$(echo "$raw_html" | tr -d '\r' | xargs)
     css=$(echo "$raw_css" | tr -d '\r' | xargs)
     bash=$(echo "$raw_bash" | tr -d '\r' | xargs)
     git=$(echo "$raw_git" | tr -d '\r' | xargs)
 
-    #checking for missing name
+    # Checking for missing name
     if [[ -z "$name" ]]; then
-        echo "Error: line $line_num skipped (missing name)">&2
+        echo "Error: line $line_num skipped (missing name)" >&2
         ((Skip_count++))
         continue
     fi
 
-    #checking for missing scores
+    # Checking for missing scores (Fixed: added >&2 and continue)
     if [[ -z "$html" ]] || [[ -z "$css" ]] || [[ -z "$bash" ]] || [[ -z "$git" ]]; then
-        echo "Error: line $line_num skipped (missing score)"
+        echo "Error: line $line_num skipped (missing score)" >&2
         ((Skip_count++))
+        continue
     fi
 
-    #make sure that scores are numeric and should not exceed 20
+    # Make sure that scores are numeric and should not exceed 20
     invalid_score=0
     for score in "$html" "$css" "$bash" "$git"; do
         if ! [[ "$score" =~ ^[0-9]+$ ]]; then
-            echo "Error: line $line_num skipped (score, $score is not numeric)">&2
+            echo "Error: line $line_num skipped (score, $score is not numeric)" >&2
             invalid_score=1
             break
         fi
-
         if ((score > 20)); then
-            echo "Error: line $line_num skipped (score, $score is greater then 20)">&2
+            echo "Error: line $line_num skipped (score, $score is greater than 20)" >&2
             invalid_score=1
             break
         fi
@@ -68,46 +70,42 @@ while IFS="," read -r raw_name raw_html raw_css raw_bash raw_git || [[ -n "$raw_
         ((Skip_count++))
         continue
     fi
-    #calculate total score
-    total_score=$((html + css + bash + git))
 
-    #calculate the average
+    # Calculate scores
+    total_score=$((html + css + bash + git))
     average=$(awk "BEGIN {printf \"%.2f\", $total_score / 4}")
 
-    #print out the values calculated
-    echo "Student: $name | $total_score | $average"
-
-    #compare the mention using the total score since the bash can not compare average since its in decimals
-    if ((total_score >= 64)); then 
-        mention="tres bien"
+    # Correct thresholds and exact mention formatting
+    if ((total_score >= 64)); then
+        mention="Très bien"
     elif ((total_score >= 56)); then
-        mention="bien"
-    elif ((total_score >= 46)); then
-        mention="assez bien"
-    elif ((total_score >= 46)); then
-        mention="passable"
+        mention="Bien"
+    elif ((total_score >= 48)); then
+        mention="Assez bien"
+    elif ((total_score >= 40)); then
+        mention="Passable"
     else
-        mention="echec"
+        mention="Échec"
     fi
-#save the ranging file with average first so that sort by it
+
+    # Save to temp file using pipe delimiter
     echo "$average|$name|$html|$css|$bash|$git|$mention" >> "$tmp"
+    
     class_total_score=$((class_total_score + total_score))
     ((num_students++))
-
-    echo "Line $line_num name is $raw_name"
 done < "$CSV_FILE"
 
-#sort and print the rank tbale
+# Print Table Content using process substitution to keep 'rank' in main scope
 rank=0
-sort -t "\\" -k1,1 -rn "$tmp" | while IFS='|' read -r average name html css bash git mention; do
+while IFS='|' read -r average name html css bash git mention; do
     ((rank++))
-    printf "%4s %-16s %4s %4s %4s %4s %6s %s\n" "$rank" "$name" "$html" "$css" "$bash" "$git" "$average" "$mention"
-    done
+    printf "%4s %-16s %4s %4s %4s %4s %7s %s\n" "$rank" "$name" "$html" "$css" "$bash" "$git" "$average" "$mention"
+done < <(sort -t '|' -k1,1 -rn "$tmp")
 
-#remove temporary file
+# Remove temporary file
 rm -f "$tmp"
 
-#printing the footer
+# Printing the footer
 echo "----------------------------------------------"
 if [[ "$num_students" -gt 0 ]]; then
     class_avg=$(awk "BEGIN {printf \"%.2f\", ($class_total_score / $num_students) / 4}")
@@ -116,5 +114,5 @@ else
     echo "Class average: 0.00"
 fi
 
-#print the number of skipped lines
-echo "The total lines skipped are: $Skip_count, see warnings above"
+# Fixed wording to match brief requirements exactly
+echo "Skipped $Skip_count invalid lines (see warnings above)"
